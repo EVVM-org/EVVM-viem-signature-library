@@ -2,6 +2,7 @@
   "name": "@evvm/ts-library",
   "version": "1.0.0",
   "description": "TypeScript library for EVVM blockchain interactions, signature building, and transaction execution",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
