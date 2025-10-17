@@ -14,8 +14,8 @@ export * from './utils';
 // Export signature builders
 export * from './signatures';
 
-// Export transaction executors
-export * from './executors';
+// Export ABIs
+export * from './abi';
 
 // Version
 export const VERSION = '1.0.0';
