@@ -7,7 +7,6 @@
 
 import { 
   EVVMSignatureBuilder, 
-  EVVMTransactionExecutor,
   PayInputData 
 } from '../src/index';
 
