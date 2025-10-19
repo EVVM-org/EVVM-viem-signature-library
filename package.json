@@ -1,5 +1,5 @@
 {
-  "name": "@evvm/ts-library",
+  "name": "@evvm/viem-signature-library",
   "version": "1.0.0",
   "description": "TypeScript library for EVVM blockchain interactions, signature building, and transaction execution",
   "type": "module",
