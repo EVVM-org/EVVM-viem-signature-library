@@ -28,8 +28,12 @@ jobs:
         run: npm run build
         # Cambia esto si tu script de build es diferente
 
-      - name: Bump version (patch)
-        run: npm version patch --no-git-tag-version
+      - name: Get short commit hash
+        id: vars
+        run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Bump version (prerelease with commit hash)
+        run: npm version prerelease --preid ${{ env.commit_hash }} --no-git-tag-version
 
       - name: Publish to npm
         run: npm publish --access public

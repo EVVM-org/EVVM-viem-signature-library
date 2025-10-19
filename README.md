@@ -1,63 +1,173 @@
+
+
+
 # @evvm/viem-signature-library
 
-A comprehensive TypeScript library for interacting with the EVVM blockchain ecosystem, including payment processing, staking operations, and name service functionality.
+A TypeScript library for EVVM blockchain interactions, signature building, and transaction execution. Includes payments, staking, NameService, and utilities for EVVM contracts.
 
 ## Features
 
-- 🔐 **Signature Building** - Create EIP-191 signatures for EVVM, NameService, and Staking contracts
-- 💸 **Payment Processing** - Handle single and multiple recipient payments with disperse functionality
-- 🏦 **Staking Operations** - Support for golden, presale, public, and service staking
-- 📝 **Name Service** - Username registration, offers, metadata management
-- ⚡ **Transaction Execution** - Execute transactions via smart contracts using wagmi
-- 🔧 **TypeScript Support** - Full type safety with comprehensive type definitions
-- 🎯 **Modular Design** - Use only the components you need
+- **EIP-191 Signatures** for payments, staking, and NameService
+- **Single and multiple (disperse) payments**
+- **Staking**: golden, presale, public, service
+- **NameService**: registration, offers, metadata
+- **Integration with wagmi/viem**
+- **Modular and fully typed**
 
 ## Installation
 
 ```bash
-npm install @evvm/ts-library viem wagmi
+npm install @evvm/viem-signature-library viem wagmi
 ```
 
 ### Peer Dependencies
-
-This library requires the following peer dependencies:
 
 ```bash
 npm install viem@^2.0.0 wagmi@^2.0.0
 ```
 
-## Quick Start
+## Requirements
 
-### Basic Payment Signature
+- Node.js >= 18
+- npm >= 8
+
+## Project Structure
+
+```
+src/
+├── abi/            # EVVM contract ABIs
+├── signatures/     # Signature builder classes (EVVM, NameService, Staking)
+├── types/          # TypeScript types for payments, staking, NameService
+├── utils/          # Utilities: hash, message construction
+├── __tests__/      # Unit tests
+├── index.ts        # Main export
+examples/
+└── basic-usage.ts  # Basic usage example
+```
+
+## Basic Example
 
 ```typescript
-import { createWalletClient, http, privateKeyToAccount } from 'viem';
-import { mainnet } from 'viem/chains';
-import { EVVMSignatureBuilder } from '@evvm/ts-library';
+import { EVVMSignatureBuilder, PayInputData } from '@evvm/viem-signature-library';
 
-// Setup wallet client
-const account = privateKeyToAccount('0x...' as `0x${string}`);
-const client = createWalletClient({
-  account,
-  chain: mainnet,
-  transport: http(),
-});
+const mockAccount = {
+  address: '0x742d35Cc6634C0532925a3b8D138068fd4C1B7a1' as `0x${string}`
+};
+const mockWalletClient = {
+  signMessage: async ({ message }: { message: string }) => {
+    return '0x1234567890abcdef...' as `0x${string}`;
+  }
+};
 
-// Create signature builder
-const signatureBuilder = new EVVMSignatureBuilder(client, account);
-
-// Sign a payment
+const signatureBuilder = new EVVMSignatureBuilder(mockWalletClient as any, mockAccount as any);
 const signature = await signatureBuilder.signPay(
-  1n, // evvmID
-  '0x742d35Cc6634C0532925a3b8D138068fd4C1B7a1', // to address
-  '0x0000000000000000000000000000000000000000', // token (native)
-  1000000000000000000n, // amount (1 ETH)
-  50000000000000000n, // priority fee (0.05 ETH)
-  1n, // nonce
-  true, // priority flag
-  '0x742d35Cc6634C0532925a3b8D138068fd4C1B7a1' // executor
+  1n,
+  '0x742d35Cc92d8A4bbCD07E9d4aC8b2E4c7BE7C7E3',
+  '0x0000000000000000000000000000000000000000',
+  1000000000000000000n,
+  50000000000000000n,
+  1n,
+  false,
+  mockAccount.address
 );
+
+const payInputData: PayInputData = {
+  from: mockAccount.address,
+  to_address: '0x742d35Cc92d8A4bbCD07E9d4aC8b2E4c7BE7C7E3',
+  to_identity: '',
+  token: '0x0000000000000000000000000000000000000000',
+  amount: 1000000000000000000n,
+  priorityFee: 50000000000000000n,
+  nonce: 1n,
+  priority: false,
+  executor: mockAccount.address,
+  signature,
+};
 ```
+
+## Automation & Publishing to npm
+
+This repository includes a GitHub Actions workflow to automatically publish to npm on every push to `main`. The version is bumped automatically using the short commit hash:
+
+```yaml
+name: Publish to npm
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org/'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build package
+        run: npm run build
+      - name: Get short commit hash
+        id: vars
+        run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Bump version (prerelease with commit hash)
+        run: npm version prerelease --preid ${{ env.commit_hash }} --no-git-tag-version
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create GitHub Release (optional)
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### Setting up NPM_TOKEN
+
+1. Go to https://www.npmjs.com/ and log in.
+2. In your profile, go to "Access Tokens" and generate a new "Automation" token.
+3. Copy the token and add it as a secret in your GitHub repo (`NPM_TOKEN`).
+
+## Dependencies
+
+- `viem` >= 2.0.0
+- `wagmi` >= 2.0.0
+
+## Useful Scripts
+
+- `npm run build` — Build the package
+- `npm test` — Run tests
+- `npm run lint` — Linting
+- `npm run typecheck` — Type checking
+- `npm run example` — Run the basic example
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'Add new feature'`)
+4. Push (`git push origin feature/new-feature`)
+5. Open a Pull Request
+
+## License
+
+MIT — see [LICENSE](LICENSE)
+
+## Support
+
+- Email: support@evvm.org
+- Documentation: [docs.evvm.org](https://evvm.info)
 
 ### Execute Transaction
 
