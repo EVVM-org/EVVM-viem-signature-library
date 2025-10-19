@@ -1,8 +1,14 @@
 // EVVM Smart Contract ABIs
-import EstimatorABI from './Estimator.json';
-import EvvmABI from './Evvm.json';
-import NameServiceABI from './NameService.json';
-import StakingABI from './Staking.json';
+import EstimatorABIFile from './Estimator.json';
+import EvvmABIFile from './Evvm.json';
+import NameServiceABIFile from './NameService.json';
+import StakingABIFile from './Staking.json';
+
+// Extract ABIs from JSON files
+const EstimatorABI = EstimatorABIFile.abi;
+const EvvmABI = EvvmABIFile.abi;
+const NameServiceABI = NameServiceABIFile.abi;
+const StakingABI = StakingABIFile.abi;
 
 // Export the ABIs
 export {
