@@ -1,4 +1,4 @@
-# @evvm/ts-library
+# @evvm/viem-signature-library
 
 A comprehensive TypeScript library for interacting with the EVVM blockchain ecosystem, including payment processing, staking operations, and name service functionality.
 
