@@ -6,7 +6,7 @@
  * Includes dual-signature logic for priority fee payments.
  */
 
-import type { Account, WalletClient } from 'viem';
+import type { Account, WalletClient } from "viem";
 import {
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
@@ -20,7 +20,7 @@ import {
   buildMessageSignedForFlushCustomMetadata,
   buildMessageSignedForFlushUsername,
   hashPreRegisteredUsername,
-} from '../utils';
+} from "../utils";
 
 export interface DualSignatureResult {
   paySignature?: `0x${string}`;
@@ -53,32 +53,34 @@ export class NameServiceSignatureBuilder {
    * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
    */
   async signPreRegistrationUsername(
-    evvmID: bigint,
+    evvmId: bigint,
     addressNameService: `0x${string}`,
     username: string,
     clowNumber: bigint,
     nonce: bigint,
-    priorityFee_EVVM: bigint = 0n,
-    nonce_EVVM: bigint = 0n,
-    priorityFlag_EVVM: boolean = false
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean
   ): Promise<DualSignatureResult> {
     const hashPreReg = hashPreRegisteredUsername(username, clowNumber);
     const preRegistrationMessage = buildMessageSignedForPreRegistrationUsername(
-      evvmID,
+      evvmId,
       hashPreReg,
       nonce
     );
 
-    const actionSignature = await this.signERC191Message(preRegistrationMessage);
+    const actionSignature = await this.signERC191Message(
+      preRegistrationMessage
+    );
 
     let paySignature: `0x${string}` | undefined;
     if (priorityFee_EVVM > 0n) {
       const payMessage = buildMessageSignedForPay(
-        evvmID,
+        evvmId,
         addressNameService,
-        "0x0000000000000000000000000000000000000001" as `0x${string}`, // Native token
-        priorityFee_EVVM,
+        "0x0000000000000000000000000000000000000001", // Native token
         0n,
+        priorityFee_EVVM,
         nonce_EVVM,
         priorityFlag_EVVM,
         addressNameService
@@ -96,38 +98,37 @@ export class NameServiceSignatureBuilder {
    * Signs a NameService username registration message.
    */
   async signRegistrationUsername(
-    evvmID: bigint,
+    evvmId: bigint,
     addressNameService: `0x${string}`,
     username: string,
     clowNumber: bigint,
     nonce: bigint,
-    priorityFee_EVVM: bigint = 0n,
-    nonce_EVVM: bigint = 0n,
-    priorityFlag_EVVM: boolean = false
+    mateReward: bigint,
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean
   ): Promise<DualSignatureResult> {
     const registrationMessage = buildMessageSignedForRegistrationUsername(
-      evvmID,
+      evvmId,
       username,
       clowNumber,
       nonce
     );
 
+    const payMessage = buildMessageSignedForPay(
+      evvmId,
+      addressNameService,
+      "0x0000000000000000000000000000000000000001",
+      mateReward * BigInt(100),
+      priorityFee_EVVM,
+      nonce_EVVM,
+      priorityFlag_EVVM,
+      addressNameService
+    );
+
     const actionSignature = await this.signERC191Message(registrationMessage);
 
-    let paySignature: `0x${string}` | undefined;
-    if (priorityFee_EVVM > 0n) {
-      const payMessage = buildMessageSignedForPay(
-        evvmID,
-        addressNameService,
-        "0x0000000000000000000000000000000000000001" as `0x${string}`,
-        priorityFee_EVVM,
-        0n,
-        nonce_EVVM,
-        priorityFlag_EVVM,
-        addressNameService
-      );
-      paySignature = await this.signERC191Message(payMessage);
-    }
+    const paySignature = await this.signERC191Message(payMessage);
 
     return {
       paySignature,
@@ -142,37 +143,34 @@ export class NameServiceSignatureBuilder {
     evvmID: bigint,
     addressNameService: `0x${string}`,
     username: string,
-    expireDate: bigint,
+    expirationDate: bigint,
     amount: bigint,
     nonce: bigint,
-    priorityFee_EVVM: bigint = 0n,
-    nonce_EVVM: bigint = 0n,
-    priorityFlag_EVVM: boolean = false
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean
   ): Promise<DualSignatureResult> {
     const makeOfferMessage = buildMessageSignedForMakeOffer(
       evvmID,
       username,
-      expireDate,
+      expirationDate,
       amount,
       nonce
     );
 
-    const actionSignature = await this.signERC191Message(makeOfferMessage);
+    const payMessage = buildMessageSignedForPay(
+      evvmID,
+      addressNameService,
+      "0x0000000000000000000000000000000000000001",
+      amount,
+      priorityFee_EVVM,
+      nonce_EVVM,
+      priorityFlag_EVVM,
+      addressNameService
+    );
 
-    let paySignature: `0x${string}` | undefined;
-    if (priorityFee_EVVM > 0n) {
-      const payMessage = buildMessageSignedForPay(
-        evvmID,
-        addressNameService,
-        "0x0000000000000000000000000000000000000001" as `0x${string}`,
-        priorityFee_EVVM,
-        0n,
-        nonce_EVVM,
-        priorityFlag_EVVM,
-        addressNameService
-      );
-      paySignature = await this.signERC191Message(payMessage);
-    }
+    const actionSignature = await this.signERC191Message(makeOfferMessage);
+    const paySignature = await this.signERC191Message(payMessage);
 
     return {
       paySignature,
@@ -187,16 +185,16 @@ export class NameServiceSignatureBuilder {
     evvmID: bigint,
     addressNameService: `0x${string}`,
     username: string,
-    offerID: bigint,
+    offerId: bigint,
     nonce: bigint,
-    priorityFee_EVVM: bigint = 0n,
-    nonce_EVVM: bigint = 0n,
-    priorityFlag_EVVM: boolean = false
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean
   ): Promise<DualSignatureResult> {
     const withdrawOfferMessage = buildMessageSignedForWithdrawOffer(
       evvmID,
       username,
-      offerID,
+      offerId,
       nonce
     );
 
@@ -207,9 +205,9 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000001" as `0x${string}`,
-        priorityFee_EVVM,
+        "0x0000000000000000000000000000000000000001",
         0n,
+        priorityFee_EVVM,
         nonce_EVVM,
         priorityFlag_EVVM,
         addressNameService
@@ -230,16 +228,16 @@ export class NameServiceSignatureBuilder {
     evvmID: bigint,
     addressNameService: `0x${string}`,
     username: string,
-    offerID: bigint,
+    offerId: bigint,
     nonce: bigint,
-    priorityFee_EVVM: bigint = 0n,
-    nonce_EVVM: bigint = 0n,
-    priorityFlag_EVVM: boolean = false
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean
   ): Promise<DualSignatureResult> {
     const acceptOfferMessage = buildMessageSignedForAcceptOffer(
       evvmID,
       username,
-      offerID,
+      offerId,
       nonce
     );
 
@@ -250,9 +248,9 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000001" as `0x${string}`,
-        priorityFee_EVVM,
+        "0x0000000000000000000000000000000000000001",
         0n,
+        priorityFee_EVVM,
         nonce_EVVM,
         priorityFlag_EVVM,
         addressNameService
@@ -274,32 +272,29 @@ export class NameServiceSignatureBuilder {
     addressNameService: `0x${string}`,
     username: string,
     nonce: bigint,
-    priorityFee_EVVM: bigint = 0n,
-    nonce_EVVM: bigint = 0n,
-    priorityFlag_EVVM: boolean = false
+    amountToRenew: bigint,
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean
   ): Promise<DualSignatureResult> {
     const renewUsernameMessage = buildMessageSignedForRenewUsername(
       evvmID,
       username,
       nonce
     );
+    const payMessage = buildMessageSignedForPay(
+      evvmID,
+      addressNameService,
+      "0x0000000000000000000000000000000000000001",
+      amountToRenew,
+      priorityFee_EVVM,
+      nonce_EVVM,
+      priorityFlag_EVVM,
+      addressNameService
+    );
 
     const actionSignature = await this.signERC191Message(renewUsernameMessage);
-
-    let paySignature: `0x${string}` | undefined;
-    if (priorityFee_EVVM > 0n) {
-      const payMessage = buildMessageSignedForPay(
-        evvmID,
-        addressNameService,
-        "0x0000000000000000000000000000000000000001" as `0x${string}`,
-        priorityFee_EVVM,
-        0n,
-        nonce_EVVM,
-        priorityFlag_EVVM,
-        addressNameService
-      );
-      paySignature = await this.signERC191Message(payMessage);
-    }
+    const paySignature = await this.signERC191Message(payMessage);
 
     return {
       paySignature,
@@ -313,12 +308,13 @@ export class NameServiceSignatureBuilder {
   async signAddCustomMetadata(
     evvmID: bigint,
     addressNameService: `0x${string}`,
+    nonce: bigint,
     identity: string,
     value: string,
-    nonce: bigint,
-    priorityFee_EVVM: bigint = 0n,
-    nonce_EVVM: bigint = 0n,
-    priorityFlag_EVVM: boolean = false
+    amountToAddCustomMetadata: bigint,
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean
   ): Promise<DualSignatureResult> {
     const addCustomMetadataMessage = buildMessageSignedForAddCustomMetadata(
       evvmID,
@@ -326,23 +322,22 @@ export class NameServiceSignatureBuilder {
       value,
       nonce
     );
+    const payMessage = buildMessageSignedForPay(
+      evvmID,
+      addressNameService,
+      "0x0000000000000000000000000000000000000001",
+      amountToAddCustomMetadata,
+      priorityFee_EVVM,
+      nonce_EVVM,
+      priorityFlag_EVVM,
+      addressNameService
+    );
 
-    const actionSignature = await this.signERC191Message(addCustomMetadataMessage);
+    const actionSignature = await this.signERC191Message(
+      addCustomMetadataMessage
+    );
 
-    let paySignature: `0x${string}` | undefined;
-    if (priorityFee_EVVM > 0n) {
-      const payMessage = buildMessageSignedForPay(
-        evvmID,
-        addressNameService,
-        "0x0000000000000000000000000000000000000001" as `0x${string}`,
-        priorityFee_EVVM,
-        0n,
-        nonce_EVVM,
-        priorityFlag_EVVM,
-        addressNameService
-      );
-      paySignature = await this.signERC191Message(payMessage);
-    }
+    const paySignature = await this.signERC191Message(payMessage);
 
     return {
       paySignature,
@@ -359,33 +354,30 @@ export class NameServiceSignatureBuilder {
     identity: string,
     key: bigint,
     nonce: bigint,
-    priorityFee_EVVM: bigint = 0n,
-    nonce_EVVM: bigint = 0n,
-    priorityFlag_EVVM: boolean = false
+    amountToRemoveCustomMetadata: bigint,
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean
   ): Promise<DualSignatureResult> {
-    const removeCustomMetadataMessage = buildMessageSignedForRemoveCustomMetadata(
+    const removeCustomMetadataMessage =
+      buildMessageSignedForRemoveCustomMetadata(evvmID, identity, key, nonce);
+
+    const payMessage = buildMessageSignedForPay(
       evvmID,
-      identity,
-      key,
-      nonce
+      addressNameService,
+      "0x0000000000000000000000000000000000000001",
+      amountToRemoveCustomMetadata,
+      priorityFee_EVVM,
+      nonce_EVVM,
+      priorityFlag_EVVM,
+      addressNameService
     );
 
-    const actionSignature = await this.signERC191Message(removeCustomMetadataMessage);
+    const actionSignature = await this.signERC191Message(
+      removeCustomMetadataMessage
+    );
 
-    let paySignature: `0x${string}` | undefined;
-    if (priorityFee_EVVM > 0n) {
-      const payMessage = buildMessageSignedForPay(
-        evvmID,
-        addressNameService,
-        "0x0000000000000000000000000000000000000001" as `0x${string}`,
-        priorityFee_EVVM,
-        0n,
-        nonce_EVVM,
-        priorityFlag_EVVM,
-        addressNameService
-      );
-      paySignature = await this.signERC191Message(payMessage);
-    }
+    const paySignature = await this.signERC191Message(payMessage);
 
     return {
       paySignature,
@@ -401,9 +393,10 @@ export class NameServiceSignatureBuilder {
     addressNameService: `0x${string}`,
     identity: string,
     nonce: bigint,
-    priorityFee_EVVM: bigint = 0n,
-    nonce_EVVM: bigint = 0n,
-    priorityFlag_EVVM: boolean = false
+    priceToFlushCustomMetadata: bigint,
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean
   ): Promise<DualSignatureResult> {
     const flushCustomMetadataMessage = buildMessageSignedForFlushCustomMetadata(
       evvmID,
@@ -411,22 +404,22 @@ export class NameServiceSignatureBuilder {
       nonce
     );
 
-    const actionSignature = await this.signERC191Message(flushCustomMetadataMessage);
+    const payMessage = buildMessageSignedForPay(
+      evvmID,
+      addressNameService,
+      "0x0000000000000000000000000000000000000001",
+      priceToFlushCustomMetadata,
+      priorityFee_EVVM,
+      nonce_EVVM,
+      priorityFlag_EVVM,
+      addressNameService
+    );
 
-    let paySignature: `0x${string}` | undefined;
-    if (priorityFee_EVVM > 0n) {
-      const payMessage = buildMessageSignedForPay(
-        evvmID,
-        addressNameService,
-        "0x0000000000000000000000000000000000000001" as `0x${string}`,
-        priorityFee_EVVM,
-        0n,
-        nonce_EVVM,
-        priorityFlag_EVVM,
-        addressNameService
-      );
-      paySignature = await this.signERC191Message(payMessage);
-    }
+    const actionSignature = await this.signERC191Message(
+      flushCustomMetadataMessage
+    );
+
+    const paySignature = await this.signERC191Message(payMessage);
 
     return {
       paySignature,
@@ -442,9 +435,10 @@ export class NameServiceSignatureBuilder {
     addressNameService: `0x${string}`,
     username: string,
     nonce: bigint,
-    priorityFee_EVVM: bigint = 0n,
-    nonce_EVVM: bigint = 0n,
-    priorityFlag_EVVM: boolean = false
+    priceToFlushUsername: bigint,
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean
   ): Promise<DualSignatureResult> {
     const flushUsernameMessage = buildMessageSignedForFlushUsername(
       evvmID,
@@ -452,22 +446,20 @@ export class NameServiceSignatureBuilder {
       nonce
     );
 
+    const payMessage = buildMessageSignedForPay(
+      evvmID,
+      addressNameService,
+      "0x0000000000000000000000000000000000000001",
+      priceToFlushUsername,
+      priorityFee_EVVM,
+      nonce_EVVM,
+      priorityFlag_EVVM,
+      addressNameService
+    );
+
     const actionSignature = await this.signERC191Message(flushUsernameMessage);
 
-    let paySignature: `0x${string}` | undefined;
-    if (priorityFee_EVVM > 0n) {
-      const payMessage = buildMessageSignedForPay(
-        evvmID,
-        addressNameService,
-        "0x0000000000000000000000000000000000000001" as `0x${string}`,
-        priorityFee_EVVM,
-        0n,
-        nonce_EVVM,
-        priorityFlag_EVVM,
-        addressNameService
-      );
-      paySignature = await this.signERC191Message(payMessage);
-    }
+    const paySignature = await this.signERC191Message(payMessage);
 
     return {
       paySignature,

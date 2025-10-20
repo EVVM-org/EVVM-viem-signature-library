@@ -6,13 +6,13 @@
  * Includes logic for single and dual signature staking flows.
  */
 
-import type { Account, WalletClient } from 'viem';
+import type { Account, WalletClient } from "viem";
 import {
   buildMessageSignedForPay,
   buildMessageSignedForPublicStaking,
   buildMessageSignedForPresaleStaking,
   buildMessageSignedForPublicServiceStake,
-} from '../utils';
+} from "../utils";
 
 export interface StakingDualSignatureResult {
   paySignature?: string;
@@ -90,19 +90,18 @@ export class StakingSignatureBuilder {
       nonce
     );
 
-    const stakingSignature = await this.signERC191Message(stakingMessage);
-
     const payMessage = buildMessageSignedForPay(
       evvmID,
       stakingAddress,
-      "0x0000000000000000000000000000000000000001" as `0x${string}`,
+      "0x0000000000000000000000000000000000000001",
+      isStaking ? totalPrice : BigInt(0),
       priorityFee_EVVM,
-      0n,
       nonce_EVVM,
       priorityFlag_EVVM,
       stakingAddress
     );
 
+    const stakingSignature = await this.signERC191Message(stakingMessage);
     const paySignature = await this.signERC191Message(payMessage);
 
     return {
@@ -132,18 +131,18 @@ export class StakingSignatureBuilder {
       nonceStaking
     );
 
-    const stakingSignature = await this.signERC191Message(stakingMessage);
-
     const payMessage = buildMessageSignedForPay(
       evvmID,
       stakingAddress,
-      "0x0000000000000000000000000000000000000001" as `0x${string}`,
+      "0x0000000000000000000000000000000000000001",
+      isStaking ? totalPrice : BigInt(0),
       priorityFee,
-      0n,
       nonceEVVM,
       priorityFlag,
       stakingAddress
     );
+
+    const stakingSignature = await this.signERC191Message(stakingMessage);
 
     const paySignature = await this.signERC191Message(payMessage);
 
@@ -175,18 +174,18 @@ export class StakingSignatureBuilder {
       nonce
     );
 
-    const stakingSignature = await this.signERC191Message(stakingMessage);
-
     const payMessage = buildMessageSignedForPay(
       evvmID,
       stakingAddress,
       "0x0000000000000000000000000000000000000001" as `0x${string}`,
+      isStaking ? stakingAmount * BigInt(5083 * 10 ** 18) : BigInt(0),
       priorityFee_EVVM,
-      0n,
       nonce_EVVM,
       priorityFlag_EVVM,
       stakingAddress
     );
+
+    const stakingSignature = await this.signERC191Message(stakingMessage);
 
     const paySignature = await this.signERC191Message(payMessage);
 
