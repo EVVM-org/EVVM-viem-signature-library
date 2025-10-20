@@ -59,12 +59,12 @@ export class StakingSignatureBuilder {
     const payMessage = buildMessageSignedForPay(
       evvmID,
       stakingAddress,
-      "0x0000000000000000000000000000000000000000" as `0x${string}`, // Native token
+      "0x0000000000000000000000000000000000000001" as `0x${string}`, // Native token
       totalPrice,
       0n,
       nonceEVVM,
       priorityFlag,
-      this.account.address
+      stakingAddress
     );
 
     return await this.signERC191Message(payMessage);
@@ -95,12 +95,12 @@ export class StakingSignatureBuilder {
     const payMessage = buildMessageSignedForPay(
       evvmID,
       stakingAddress,
-      "0x0000000000000000000000000000000000000000" as `0x${string}`,
+      "0x0000000000000000000000000000000000000001" as `0x${string}`,
       priorityFee_EVVM,
       0n,
       nonce_EVVM,
       priorityFlag_EVVM,
-      this.account.address
+      stakingAddress
     );
 
     const paySignature = await this.signERC191Message(payMessage);
@@ -137,12 +137,12 @@ export class StakingSignatureBuilder {
     const payMessage = buildMessageSignedForPay(
       evvmID,
       stakingAddress,
-      "0x0000000000000000000000000000000000000000" as `0x${string}`,
+      "0x0000000000000000000000000000000000000001" as `0x${string}`,
       priorityFee,
       0n,
       nonceEVVM,
       priorityFlag,
-      this.account.address
+      stakingAddress
     );
 
     const paySignature = await this.signERC191Message(payMessage);
@@ -180,12 +180,12 @@ export class StakingSignatureBuilder {
     const payMessage = buildMessageSignedForPay(
       evvmID,
       stakingAddress,
-      "0x0000000000000000000000000000000000000000" as `0x${string}`,
+      "0x0000000000000000000000000000000000000001" as `0x${string}`,
       priorityFee_EVVM,
       0n,
       nonce_EVVM,
       priorityFlag_EVVM,
-      this.account.address
+      stakingAddress
     );
 
     const paySignature = await this.signERC191Message(payMessage);

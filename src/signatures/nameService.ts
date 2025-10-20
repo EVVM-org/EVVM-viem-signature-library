@@ -76,12 +76,12 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000000" as `0x${string}`, // Native token
+        "0x0000000000000000000000000000000000000001" as `0x${string}`, // Native token
         priorityFee_EVVM,
         0n,
         nonce_EVVM,
         priorityFlag_EVVM,
-        this.account.address
+        addressNameService
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -119,12 +119,12 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000000" as `0x${string}`,
+        "0x0000000000000000000000000000000000000001" as `0x${string}`,
         priorityFee_EVVM,
         0n,
         nonce_EVVM,
         priorityFlag_EVVM,
-        this.account.address
+        addressNameService
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -164,12 +164,12 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000000" as `0x${string}`,
+        "0x0000000000000000000000000000000000000001" as `0x${string}`,
         priorityFee_EVVM,
         0n,
         nonce_EVVM,
         priorityFlag_EVVM,
-        this.account.address
+        addressNameService
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -207,12 +207,12 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000000" as `0x${string}`,
+        "0x0000000000000000000000000000000000000001" as `0x${string}`,
         priorityFee_EVVM,
         0n,
         nonce_EVVM,
         priorityFlag_EVVM,
-        this.account.address
+        addressNameService
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -250,12 +250,12 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000000" as `0x${string}`,
+        "0x0000000000000000000000000000000000000001" as `0x${string}`,
         priorityFee_EVVM,
         0n,
         nonce_EVVM,
         priorityFlag_EVVM,
-        this.account.address
+        addressNameService
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -291,12 +291,12 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000000" as `0x${string}`,
+        "0x0000000000000000000000000000000000000001" as `0x${string}`,
         priorityFee_EVVM,
         0n,
         nonce_EVVM,
         priorityFlag_EVVM,
-        this.account.address
+        addressNameService
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -334,12 +334,12 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000000" as `0x${string}`,
+        "0x0000000000000000000000000000000000000001" as `0x${string}`,
         priorityFee_EVVM,
         0n,
         nonce_EVVM,
         priorityFlag_EVVM,
-        this.account.address
+        addressNameService
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -377,12 +377,12 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000000" as `0x${string}`,
+        "0x0000000000000000000000000000000000000001" as `0x${string}`,
         priorityFee_EVVM,
         0n,
         nonce_EVVM,
         priorityFlag_EVVM,
-        this.account.address
+        addressNameService
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -418,12 +418,12 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000000" as `0x${string}`,
+        "0x0000000000000000000000000000000000000001" as `0x${string}`,
         priorityFee_EVVM,
         0n,
         nonce_EVVM,
         priorityFlag_EVVM,
-        this.account.address
+        addressNameService
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -459,12 +459,12 @@ export class NameServiceSignatureBuilder {
       const payMessage = buildMessageSignedForPay(
         evvmID,
         addressNameService,
-        "0x0000000000000000000000000000000000000000" as `0x${string}`,
+        "0x0000000000000000000000000000000000000001" as `0x${string}`,
         priorityFee_EVVM,
         0n,
         nonce_EVVM,
         priorityFlag_EVVM,
-        this.account.address
+        addressNameService
       );
       paySignature = await this.signERC191Message(payMessage);
     }
