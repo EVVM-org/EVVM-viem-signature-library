@@ -16,7 +16,7 @@ import {
 
 export interface StakingDualSignatureResult {
   paySignature?: string;
-  stakingSignature: string;
+  actionSignature: string;
 }
 
 export class StakingSignatureBuilder {
@@ -101,12 +101,12 @@ export class StakingSignatureBuilder {
       stakingAddress
     );
 
-    const stakingSignature = await this.signERC191Message(stakingMessage);
+    const actionSignature = await this.signERC191Message(stakingMessage);
     const paySignature = await this.signERC191Message(payMessage);
 
     return {
       paySignature,
-      stakingSignature,
+      actionSignature,
     };
   }
 
@@ -142,13 +142,13 @@ export class StakingSignatureBuilder {
       stakingAddress
     );
 
-    const stakingSignature = await this.signERC191Message(stakingMessage);
+    const actionSignature = await this.signERC191Message(stakingMessage);
 
     const paySignature = await this.signERC191Message(payMessage);
 
     return {
       paySignature,
-      stakingSignature,
+      actionSignature,
     };
   }
 
@@ -185,13 +185,13 @@ export class StakingSignatureBuilder {
       stakingAddress
     );
 
-    const stakingSignature = await this.signERC191Message(stakingMessage);
+    const actionSignature = await this.signERC191Message(stakingMessage);
 
     const paySignature = await this.signERC191Message(payMessage);
 
     return {
       paySignature,
-      stakingSignature,
+      actionSignature,
     };
   }
 }
