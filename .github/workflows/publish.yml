@@ -70,13 +70,13 @@ jobs:
             commits=$(git log --oneline --pretty=format:"%s" ${last_tag}..HEAD)
           fi
           
-          # Check for specific major update message
-          if echo "$commits" | grep -q "major update init"; then
+          # Check for MAJOR: prefix
+          if echo "$commits" | grep -q "^MAJOR:"; then
             echo "bump_type=major" >> $GITHUB_OUTPUT
-          # Check for specific minor update message
-          elif echo "$commits" | grep -q "minor update init"; then
+          # Check for MINOR: prefix
+          elif echo "$commits" | grep -q "^MINOR:"; then
             echo "bump_type=minor" >> $GITHUB_OUTPUT
-          # Default to patch for all other changes
+          # Default to patch for all other commit types
           else
             echo "bump_type=patch" >> $GITHUB_OUTPUT
           fi
