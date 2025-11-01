@@ -234,7 +234,6 @@ Handles staking operations:
 - `signGoldenStaking()` - Golden staking (single signature)
 - `signPresaleStaking()` - Presale staking (dual signature)
 - `signPublicStaking()` - Public staking (dual signature)
-- `signPublicServiceStaking()` - Service staking (dual signature)
 
 ### Transaction Executors
 

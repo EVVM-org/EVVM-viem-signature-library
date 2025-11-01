@@ -152,46 +152,5 @@ export class StakingSignatureBuilder {
     };
   }
 
-  /**
-   * Signs a public service staking message (dual signature: payment + staking for specific service).
-   */
-  async signPublicServiceStaking(
-    evvmID: bigint,
-    stakingAddress: `0x${string}`,
-    serviceAddress: string,
-    isStaking: boolean,
-    stakingAmount: bigint,
-    nonce: bigint,
-    priorityFee_EVVM: bigint,
-    nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
-  ): Promise<StakingDualSignatureResult> {
-    const stakingMessage = buildMessageSignedForPublicServiceStake(
-      evvmID,
-      serviceAddress,
-      isStaking,
-      stakingAmount,
-      nonce
-    );
 
-    const payMessage = buildMessageSignedForPay(
-      evvmID,
-      stakingAddress,
-      "0x0000000000000000000000000000000000000001" as `0x${string}`,
-      isStaking ? stakingAmount * BigInt(5083 * 10 ** 18) : BigInt(0),
-      priorityFee_EVVM,
-      nonce_EVVM,
-      priorityFlag_EVVM,
-      stakingAddress
-    );
-
-    const actionSignature = await this.signERC191Message(stakingMessage);
-
-    const paySignature = await this.signERC191Message(payMessage);
-
-    return {
-      paySignature,
-      actionSignature,
-    };
-  }
 }

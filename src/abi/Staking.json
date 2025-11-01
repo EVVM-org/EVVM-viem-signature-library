@@ -119,6 +119,13 @@
     },
     {
       "type": "function",
+      "name": "confirmServiceStaking",
+      "inputs": [],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
       "name": "confirmSetSecondsToUnllockFullUnstaking",
       "inputs": [],
       "outputs": [],
@@ -413,6 +420,19 @@
     },
     {
       "type": "function",
+      "name": "prepareServiceStaking",
+      "inputs": [
+        {
+          "name": "amountOfStaking",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
       "name": "prepareSetSecondsToUnllockFullUnstaking",
       "inputs": [
         {
@@ -497,32 +517,6 @@
     },
     {
       "type": "function",
-      "name": "publicServiceStaking",
-      "inputs": [
-        { "name": "user", "type": "address", "internalType": "address" },
-        { "name": "service", "type": "address", "internalType": "address" },
-        { "name": "isStaking", "type": "bool", "internalType": "bool" },
-        {
-          "name": "amountOfStaking",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        { "name": "nonce", "type": "uint256", "internalType": "uint256" },
-        { "name": "signature", "type": "bytes", "internalType": "bytes" },
-        {
-          "name": "priorityFee_EVVM",
-          "type": "uint256",
-          "internalType": "uint256"
-        },
-        { "name": "nonce_EVVM", "type": "uint256", "internalType": "uint256" },
-        { "name": "priorityFlag_EVVM", "type": "bool", "internalType": "bool" },
-        { "name": "signature_EVVM", "type": "bytes", "internalType": "bytes" }
-      ],
-      "outputs": [],
-      "stateMutability": "nonpayable"
-    },
-    {
-      "type": "function",
       "name": "publicStaking",
       "inputs": [
         { "name": "user", "type": "address", "internalType": "address" },
@@ -574,17 +568,41 @@
       "outputs": [],
       "stateMutability": "nonpayable"
     },
+    {
+      "type": "function",
+      "name": "serviceUnstaking",
+      "inputs": [
+        {
+          "name": "amountOfStaking",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
     { "type": "error", "name": "AddressIsNotAService", "inputs": [] },
+    { "type": "error", "name": "AddressMismatch", "inputs": [] },
+    { "type": "error", "name": "AddressMustWaitToFullUnstake", "inputs": [] },
+    { "type": "error", "name": "AddressMustWaitToStakeAgain", "inputs": [] },
     { "type": "error", "name": "InvalidSignatureOnStaking", "inputs": [] },
     { "type": "error", "name": "PresaleStakingDisabled", "inputs": [] },
-    { "type": "error", "name": "PublicStakingDisabled", "inputs": [] },
     { "type": "error", "name": "SenderIsNotAdmin", "inputs": [] },
     { "type": "error", "name": "SenderIsNotGoldenFisher", "inputs": [] },
+    {
+      "type": "error",
+      "name": "ServiceDoesNotFulfillCorrectStakingAmount",
+      "inputs": [
+        {
+          "name": "requiredAmount",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
+    },
+    { "type": "error", "name": "ServiceDoesNotStakeInSameTx", "inputs": [] },
     { "type": "error", "name": "StakingNonceAlreadyUsed", "inputs": [] },
-    { "type": "error", "name": "UserAndServiceMismatch", "inputs": [] },
     { "type": "error", "name": "UserIsNotPresaleStaker", "inputs": [] },
-    { "type": "error", "name": "UserMustWaitToFullUnstake", "inputs": [] },
-    { "type": "error", "name": "UserMustWaitToStakeAgain", "inputs": [] },
     { "type": "error", "name": "UserPresaleStakerLimitExceeded", "inputs": [] }
   ]
 }
