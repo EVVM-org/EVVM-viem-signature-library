@@ -306,8 +306,10 @@
     },
     {
       "type": "function",
-      "name": "getPricePerRegistration",
-      "inputs": [],
+      "name": "getPriceOfRegistration",
+      "inputs": [
+        { "name": "username", "type": "string", "internalType": "string" }
+      ],
       "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
       "stateMutability": "view"
     },
