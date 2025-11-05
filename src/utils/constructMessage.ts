@@ -42,7 +42,7 @@ function constructMessageForDepositFisher(
   nonce: bigint,
   tokenAddress: string,
   priorityFee: string,
-  ammount: string
+  ammount: string,
 ): string {
   // For ERC20 tokens, include token address in the message
   // For native currency, exclude token address
@@ -77,10 +77,12 @@ function buildMessageSignedForPay(
   priorityFee: bigint,
   nonce: bigint,
   priorityFlag: boolean,
-  executor: `0x${string}`
+  executor: `0x${string}`,
 ): string {
   if (typeof to !== "string" || !to) {
-    throw new Error("Invalid 'to' address passed to buildMessageSignedForPay: value is undefined or not a string");
+    throw new Error(
+      "Invalid 'to' address passed to buildMessageSignedForPay: value is undefined or not a string",
+    );
   }
   const inputs: string =
     `${to.startsWith("0x") ? to.toLowerCase() : to},` +
@@ -119,7 +121,7 @@ function buildMessageSignedForDispersePay(
   priorityFee: bigint,
   nonce: bigint,
   priorityFlag: boolean,
-  executor: `0x${string}`
+  executor: `0x${string}`,
 ): string {
   const inputs: string =
     `${"0x" + hashList.toUpperCase().slice(2)},` +
@@ -152,10 +154,12 @@ function buildMessageSignedForPublicStaking(
   evvmID: bigint,
   isStaking: boolean,
   amountOfSMate: bigint,
-  nonce: bigint
+  nonce: bigint,
 ): string {
   const inputs: string =
-    `${isStaking ? "true" : "false"},` + `${amountOfSMate.toString()},` + `${nonce.toString()}`;
+    `${isStaking ? "true" : "false"},` +
+    `${amountOfSMate.toString()},` +
+    `${nonce.toString()}`;
 
   return basicMessageBuilder(evvmID.toString(), "publicStaking", inputs);
 }
@@ -164,7 +168,7 @@ function buildMessageSignedForPresaleStaking(
   evvmID: bigint,
   isStaking: boolean,
   amountOfSMate: bigint,
-  nonce: bigint
+  nonce: bigint,
 ): string {
   const inputs: string =
     `${isStaking ? "true" : "false"},` +
@@ -179,7 +183,7 @@ function buildMessageSignedForPublicServiceStake(
   serviceAddress: string,
   isStaking: boolean,
   amountOfSMate: bigint,
-  nonce: bigint
+  nonce: bigint,
 ): string {
   const inputs: string =
     `${serviceAddress.toLowerCase()},` +
@@ -201,7 +205,7 @@ function buildMessageSignedForPublicServiceStake(
 function buildMessageSignedForPreRegistrationUsername(
   evvmID: bigint,
   hashUsername: string,
-  nonceNameService: bigint
+  nonceNameService: bigint,
 ): string {
   const inputs: string =
     `${
@@ -212,7 +216,7 @@ function buildMessageSignedForPreRegistrationUsername(
   return basicMessageBuilder(
     evvmID.toString(),
     "preRegistrationUsername",
-    inputs
+    inputs,
   );
 }
 
@@ -220,10 +224,12 @@ function buildMessageSignedForRegistrationUsername(
   evvmID: bigint,
   username: string,
   clowNumber: bigint,
-  nonceNameService: bigint
+  nonceNameService: bigint,
 ): string {
   const inputs: string =
-    `${username},` + `${clowNumber.toString()},` + `${nonceNameService.toString()}`;
+    `${username},` +
+    `${clowNumber.toString()},` +
+    `${nonceNameService.toString()}`;
 
   return basicMessageBuilder(evvmID.toString(), "registrationUsername", inputs);
 }
@@ -233,7 +239,7 @@ function buildMessageSignedForMakeOffer(
   username: string,
   dateExpire: bigint,
   amount: bigint,
-  nonceNameService: bigint
+  nonceNameService: bigint,
 ): string {
   const inputs: string =
     `${username},` +
@@ -248,7 +254,7 @@ function buildMessageSignedForWithdrawOffer(
   evvmID: bigint,
   username: string,
   offerId: bigint,
-  mateNameServiceNonce: bigint
+  mateNameServiceNonce: bigint,
 ): string {
   const inputs: string =
     `${username},` +
@@ -262,7 +268,7 @@ function buildMessageSignedForAcceptOffer(
   evvmID: bigint,
   username: string,
   offerId: bigint,
-  mateNameServiceNonce: bigint
+  mateNameServiceNonce: bigint,
 ): string {
   const inputs: string =
     `${username},` +
@@ -275,7 +281,7 @@ function buildMessageSignedForAcceptOffer(
 function buildMessageSignedForRenewUsername(
   evvmID: bigint,
   username: string,
-  mateNameServiceNonce: bigint
+  mateNameServiceNonce: bigint,
 ): string {
   const inputs: string = `${username},` + `${mateNameServiceNonce.toString()}`;
 
@@ -286,7 +292,7 @@ function buildMessageSignedForAddCustomMetadata(
   evvmID: bigint,
   identity: string,
   value: string,
-  mateNameServiceNonce: bigint
+  mateNameServiceNonce: bigint,
 ): string {
   const inputs: string =
     `${identity},` + `${value},` + `${mateNameServiceNonce.toString()}`;
@@ -298,7 +304,7 @@ function buildMessageSignedForRemoveCustomMetadata(
   evvmID: bigint,
   identity: string,
   key: bigint,
-  nonceNameService: bigint
+  nonceNameService: bigint,
 ): string {
   const inputs: string =
     `${identity},` + `${key.toString()},` + `${nonceNameService.toString()}`;
@@ -309,7 +315,7 @@ function buildMessageSignedForRemoveCustomMetadata(
 function buildMessageSignedForFlushCustomMetadata(
   evvmID: bigint,
   identity: string,
-  nonceNameService: bigint
+  nonceNameService: bigint,
 ): string {
   const inputs: string = `${identity},` + `${nonceNameService.toString()}`;
 
@@ -319,17 +325,77 @@ function buildMessageSignedForFlushCustomMetadata(
 function buildMessageSignedForFlushUsername(
   evvmID: bigint,
   username: string,
-  nonceNameService: bigint
+  nonceNameService: bigint,
 ): string {
   const inputs: string = `${username},` + `${nonceNameService.toString()}`;
 
   return basicMessageBuilder(evvmID.toString(), "flushUsername", inputs);
 }
 
+//・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
+/*
+┏━━━━━━━━━━━━━━━━━━━━━━━━┓
+ P2P Swap Signatures  
+┗━━━━━━━━━━━━━━━━━━━━━━━━┛
+*/
+//・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
+
+function buildMessageSignedForMakeOrder(
+  evvmID: bigint,
+  nonce: bigint,
+  tokenA: string,
+  tokenB: string,
+  amountA: string,
+  amountB: string,
+): string {
+  const inputs: string =
+    `${nonce.toString()},` +
+    `${tokenA},` +
+    `${tokenB},` +
+    `${amountA},` +
+    `${amountB}`;
+
+  return basicMessageBuilder(evvmID.toString(), "makeOrder", inputs);
+}
+
+function buildMessageSignedForCancelOrder(
+  evvmID: bigint,
+  nonce: bigint,
+  tokenA: string,
+  tokenB: string,
+  orderId: bigint
+): string {
+  const inputs: string =
+    `${nonce.toString()},` +
+    `${tokenA},` +
+    `${tokenB},` +
+    `${orderId.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "cancelOrder", inputs);
+}
+
+function buildMessageSignedForDispatchOrder(
+  evvmID: bigint,
+  nonce: bigint,
+  tokenA: string,
+  tokenB: string,
+  orderId: bigint
+): string {
+  const inputs: string =
+    `${nonce.toString()},` +
+    `${tokenA},` +
+    `${tokenB},` +
+    `${orderId.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "dispatchOrder", inputs);
+}
+
+//・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
+
 function basicMessageBuilder(
   evvmID: string,
   functionName: string,
-  inputs: string
+  inputs: string,
 ): string {
   return evvmID + "," + functionName + "," + inputs;
 }
@@ -351,5 +417,8 @@ export {
   buildMessageSignedForRemoveCustomMetadata,
   buildMessageSignedForFlushCustomMetadata,
   buildMessageSignedForFlushUsername,
+  buildMessageSignedForMakeOrder,
+  buildMessageSignedForCancelOrder,
+  buildMessageSignedForDispatchOrder,
   basicMessageBuilder,
 };
