@@ -3,6 +3,7 @@ name: Publish to npm and Create Release
 permissions:
   contents: write
   packages: write
+  id-token: write  # Required for OIDC trusted publishing
 
 on:
   push:
@@ -27,6 +28,7 @@ jobs:
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org/'
+          # OIDC trusted publishing - no need for NODE_AUTH_TOKEN
 
       - name: Install dependencies
         run: npm ci
@@ -95,9 +97,9 @@ jobs:
           git push origin main
 
       - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance
+        # Using OIDC trusted publishing - no NODE_AUTH_TOKEN needed
+        # The --provenance flag adds automatic attestation for better security
 
       - name: Create Git Tag
         run: |
