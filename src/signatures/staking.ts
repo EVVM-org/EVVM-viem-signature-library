@@ -1,3 +1,15 @@
+import {
+  buildMessageSignedForPay,
+  buildMessageSignedForPublicStaking,
+  buildMessageSignedForPresaleStaking,
+} from "../utils";
+import { SignatureBuilder } from "./signature-builder";
+
+export interface StakingDualSignatureResult {
+  paySignature?: string;
+  actionSignature: string;
+}
+
 /**
  * Staking Signature Builder
  *
@@ -5,41 +17,7 @@
  * Provides functions for each staking action, using viem for EIP-191 signatures.
  * Includes logic for single and dual signature staking flows.
  */
-
-import type { Account, WalletClient } from "viem";
-import {
-  buildMessageSignedForPay,
-  buildMessageSignedForPublicStaking,
-  buildMessageSignedForPresaleStaking,
-  buildMessageSignedForPublicServiceStake,
-} from "../utils";
-
-export interface StakingDualSignatureResult {
-  paySignature?: string;
-  actionSignature: string;
-}
-
-export class StakingSignatureBuilder {
-  private walletClient: WalletClient;
-  private account: Account;
-
-  constructor(walletClient: WalletClient, account: Account) {
-    this.walletClient = walletClient;
-    this.account = account;
-  }
-
-  /**
-   * Signs a generic EIP-191 message.
-   * @param message Message to sign
-   * @returns Promise resolving to signature string
-   */
-  async signERC191Message(message: string): Promise<`0x${string}`> {
-    return await this.walletClient.signMessage({
-      account: this.account,
-      message,
-    });
-  }
-
+export class StakingSignatureBuilder extends SignatureBuilder {
   /**
    * Signs a golden staking message (single signature, 5083 EVVM per stake).
    * @param evvmID EVVM chain ID
@@ -54,7 +32,7 @@ export class StakingSignatureBuilder {
     stakingAddress: `0x${string}`,
     totalPrice: bigint,
     nonceEVVM: bigint,
-    priorityFlag: boolean
+    priorityFlag: boolean,
   ): Promise<`0x${string}`> {
     const payMessage = buildMessageSignedForPay(
       evvmID,
@@ -64,7 +42,7 @@ export class StakingSignatureBuilder {
       0n,
       nonceEVVM,
       priorityFlag,
-      stakingAddress
+      stakingAddress,
     );
 
     return await this.signERC191Message(payMessage);
@@ -81,13 +59,13 @@ export class StakingSignatureBuilder {
     priorityFee_EVVM: bigint,
     totalPrice: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<StakingDualSignatureResult> {
     const stakingMessage = buildMessageSignedForPresaleStaking(
       evvmID,
       isStaking,
       totalPrice,
-      nonce
+      nonce,
     );
 
     const payMessage = buildMessageSignedForPay(
@@ -98,7 +76,7 @@ export class StakingSignatureBuilder {
       priorityFee_EVVM,
       nonce_EVVM,
       priorityFlag_EVVM,
-      stakingAddress
+      stakingAddress,
     );
 
     const actionSignature = await this.signERC191Message(stakingMessage);
@@ -122,13 +100,13 @@ export class StakingSignatureBuilder {
     totalPrice: bigint,
     priorityFee: bigint,
     nonceEVVM: bigint,
-    priorityFlag: boolean
+    priorityFlag: boolean,
   ): Promise<StakingDualSignatureResult> {
     const stakingMessage = buildMessageSignedForPublicStaking(
       evvmID,
       isStaking,
       stakingAmount,
-      nonceStaking
+      nonceStaking,
     );
 
     const payMessage = buildMessageSignedForPay(
@@ -139,7 +117,7 @@ export class StakingSignatureBuilder {
       priorityFee,
       nonceEVVM,
       priorityFlag,
-      stakingAddress
+      stakingAddress,
     );
 
     const actionSignature = await this.signERC191Message(stakingMessage);
@@ -151,6 +129,4 @@ export class StakingSignatureBuilder {
       actionSignature,
     };
   }
-
-
 }
