@@ -1,6 +1,3 @@
-
-
-
 # @evvm/viem-signature-library
 
 A TypeScript library for EVVM blockchain interactions, signature building, and transaction execution. Includes payments, staking, NameService, and utilities for EVVM contracts.
@@ -34,110 +31,115 @@ npm install viem@^2.0.0 wagmi@^2.0.0
 ## Project Structure
 
 ```
-src/
-├── abi/            # EVVM contract ABIs
-├── signatures/     # Signature builder classes (EVVM, NameService, Staking)
-├── types/          # TypeScript types for payments, staking, NameService
-├── utils/          # Utilities: hash, message construction
-├── __tests__/      # Unit tests
-├── index.ts        # Main export
-examples/
-└── basic-usage.ts  # Basic usage example
+.
+├── .github/              # GitHub Actions workflows
+├── examples/             # Usage examples
+├── src/
+│   ├── abi/              # Contract ABIs (e.g., Estimator, Evvm, NameService)
+│   ├── signatures/       # Signature building logic (e.g., evvm, nameService, staking)
+│   ├── tests/            # Unit tests
+│   ├── types/            # TypeScript type definitions (e.g., abi, core, evvm)
+│   ├── utils/            # Utility functions (e.g., constructMessage, hashTools)
+│   └── index.ts          # Main entry point
+├── .eslintrc.js
+├── .gitignore
+├── jest.config.js
+├── LICENSE
+├── package-lock.json
+├── package.json
+├── README.md
+├── rollup.config.js
+├── tsconfig.build.json
+└── tsconfig.json
 ```
 
 ## Basic Example
 
 ```typescript
-import { EVVMSignatureBuilder, PayInputData } from '@evvm/viem-signature-library';
+import {
+  EVVMSignatureBuilder,
+  PayInputData,
+} from "@evvm/viem-signature-library";
+import { Account, WalletClient } from "viem";
 
-const mockAccount = {
-  address: '0x742d35Cc6634C0532925a3b8D138068fd4C1B7a1' as `0x${string}`
+// 1. Define your account and wallet client (e.g., from wagmi)
+const mockAccount: Account = {
+  address: "0x742d35Cc6634C0532925a3b8D138068fd4C1B7a1",
+  type: "json-rpc",
 };
-const mockWalletClient = {
+
+const mockWalletClient: WalletClient = {
+  ...({} as WalletClient),
+  account: mockAccount,
   signMessage: async ({ message }: { message: string }) => {
-    return '0x1234567890abcdef...' as `0x${string}`;
-  }
+    console.log("Signing message:", message);
+    // In a real app, this would be a real signature
+    return "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
+  },
 };
 
-const signatureBuilder = new EVVMSignatureBuilder(mockWalletClient as any, mockAccount as any);
-const signature = await signatureBuilder.signPay(
-  1n,
-  '0x742d35Cc92d8A4bbCD07E9d4aC8b2E4c7BE7C7E3',
-  '0x0000000000000000000000000000000000000000',
-  1000000000000000000n,
-  50000000000000000n,
-  1n,
-  false,
-  mockAccount.address
-);
+async function createPayment() {
+  // 2. Create a signature builder instance
+  const signatureBuilder = new EVVMSignatureBuilder(
+    mockWalletClient,
+    mockAccount
+  );
 
-const payInputData: PayInputData = {
-  from: mockAccount.address,
-  to_address: '0x742d35Cc92d8A4bbCD07E9d4aC8b2E4c7BE7C7E3',
-  to_identity: '',
-  token: '0x0000000000000000000000000000000000000000',
-  amount: 1000000000000000000n,
-  priorityFee: 50000000000000000n,
-  nonce: 1n,
-  priority: false,
-  executor: mockAccount.address,
-  signature,
-};
+  // 3. Define payment details
+  const evmId = 1n;
+  const toAddress = "0x742d35Cc92d8A4bbCD07E9d4aC8b2E4c7BE7C7E3";
+  const tokenAddress = "0x0000000000000000000000000000000000000000"; // Native token
+  const amount = 1000000000000000000n; // 1 ETH
+  const priorityFee = 50000000000000000n; // 0.05 ETH
+  const nonce = 1n;
+  const priority = false;
+  const executor = mockAccount.address;
+
+  // 4. Sign the payment message
+  const signature = await signatureBuilder.signPay(
+    evmId,
+    toAddress,
+    tokenAddress,
+    amount,
+    priorityFee,
+    nonce,
+    priority,
+    executor
+  );
+
+  console.log("Generated Signature:", signature);
+
+  // 5. Prepare the data for the transaction
+  const payInputData: PayInputData = {
+    from: mockAccount.address,
+    to_address: toAddress,
+    to_identity: "", // Optional: for name service integration
+    token: tokenAddress,
+    amount,
+    priorityFee,
+    nonce,
+    priority,
+    executor,
+    signature,
+  };
+
+  console.log("Payment Input Data:", payInputData);
+
+  // 6. Now you can send this data to the EVVM contract
+  // Example (using viem):
+  /*
+  const { request } = await publicClient.simulateContract({
+    address: EVVM_CONTRACT_ADDRESS,
+    abi: EvvmAbi,
+    functionName: 'pay',
+    args: [payInputData],
+  });
+  const hash = await walletClient.writeContract(request);
+  */
+}
+
+createPayment();
 ```
-
-## Automation & Publishing to npm
-
-This repository includes a GitHub Actions workflow to automatically publish to npm on every push to `main`. The version is bumped automatically using the short commit hash:
-
-```yaml
-name: Publish to npm
-
-permissions:
-  contents: write
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: 'https://registry.npmjs.org/'
-      - name: Install dependencies
-        run: npm ci
-      - name: Build package
-        run: npm run build
-      - name: Get short commit hash
-        id: vars
-        run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-      - name: Bump version (prerelease with commit hash)
-        run: npm version prerelease --preid ${{ env.commit_hash }} --no-git-tag-version
-      - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Create GitHub Release (optional)
-        if: success()
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ github.run_number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
-
-### Setting up NPM_TOKEN
-
-1. Go to https://www.npmjs.com/ and log in.
-2. In your profile, go to "Access Tokens" and generate a new "Automation" token.
-3. Copy the token and add it as a secret in your GitHub repo (`NPM_TOKEN`).
 
 ## Dependencies
 
@@ -168,37 +170,6 @@ MIT — see [LICENSE](LICENSE)
 
 - Email: support@evvm.org
 - Documentation: [docs.evvm.org](https://evvm.info)
-
-### Execute Transaction
-
-```typescript
-import { createConfig } from 'wagmi';
-import { EVVMTransactionExecutor, PayInputData } from '@evvm/ts-library';
-
-const config = createConfig({
-  // your wagmi config
-});
-
-const executor = new EVVMTransactionExecutor(config);
-
-const paymentData: PayInputData = {
-  from: '0x742d35Cc6634C0532925a3b8D138068fd4C1B7a1',
-  to_address: '0x456...',
-  to_identity: 'username.evvm',
-  token: '0x0000000000000000000000000000000000000000',
-  amount: 1000000000000000000n,
-  priorityFee: 50000000000000000n,
-  nonce: 1n,
-  priority: true,
-  executor: '0x742d35Cc6634C0532925a3b8D138068fd4C1B7a1',
-  signature: signature,
-};
-
-const txHash = await executor.executePay(
-  paymentData,
-  '0xEVVMContractAddress' as `0x${string}`
-);
-```
 
 ## API Reference
 
@@ -294,46 +265,47 @@ The library provides comprehensive TypeScript types:
 ### Disperse Payment
 
 ```typescript
-import { DispersePayMetadata } from '@evvm/ts-library';
+import { DispersePayMetadata } from "@evvm/ts-library";
 
 const recipients: DispersePayMetadata[] = [
   {
     amount: 500000000000000000n, // 0.5 ETH
-    to_address: '0x123...',
-    to_identity: 'alice.evvm'
+    to_address: "0x123...",
+    to_identity: "alice.evvm",
   },
   {
     amount: 500000000000000000n, // 0.5 ETH
-    to_address: '0x456...',
-    to_identity: 'bob.evvm'
-  }
+    to_address: "0x456...",
+    to_identity: "bob.evvm",
+  },
 ];
 
 const signature = await signatureBuilder.signDispersePay(
   1n, // evvmID
   recipients,
-  '0x0000000000000000000000000000000000000000', // native token
+  "0x0000000000000000000000000000000000000000", // native token
   1000000000000000000n, // total amount (1 ETH)
   50000000000000000n, // priority fee
   1n, // nonce
   true, // priority flag
-  executor
+  executor,
 );
 ```
 
 ### Name Service Registration
 
 ```typescript
-const { paySignature, actionSignature } = await nameServiceBuilder.signRegistrationUsername(
-  1n, // evvmID
-  '0xNameServiceAddress' as `0x${string}`,
-  'myusername', // username
-  12345n, // clown number
-  1n, // nonce
-  100000000000000000n, // priority fee (0.1 ETH)
-  2n, // EVVM nonce
-  true // priority flag
-);
+const { paySignature, actionSignature } =
+  await nameServiceBuilder.signRegistrationUsername(
+    1n, // evvmID
+    "0xNameServiceAddress" as `0x${string}`,
+    "myusername", // username
+    12345n, // clown number
+    1n, // nonce
+    100000000000000000n, // priority fee (0.1 ETH)
+    2n, // EVVM nonce
+    true, // priority flag
+  );
 ```
 
 ### Staking Operations
@@ -342,24 +314,25 @@ const { paySignature, actionSignature } = await nameServiceBuilder.signRegistrat
 // Golden staking (single signature)
 const goldenSignature = await stakingBuilder.signGoldenStaking(
   1n, // evvmID
-  '0xStakingAddress' as `0x${string}`,
+  "0xStakingAddress" as `0x${string}`,
   5083000000000000000000n, // 5083 EVVM
   1n, // nonce
-  true // priority flag
+  true, // priority flag
 );
 
 // Public staking (dual signature)
-const { paySignature, stakingSignature } = await stakingBuilder.signPublicStaking(
-  1n, // evvmID
-  '0xStakingAddress' as `0x${string}`,
-  true, // is staking
-  1000000000000000000n, // staking amount
-  1n, // staking nonce
-  1000000000000000000n, // total price
-  50000000000000000n, // priority fee
-  2n, // EVVM nonce
-  true // priority flag
-);
+const { paySignature, stakingSignature } =
+  await stakingBuilder.signPublicStaking(
+    1n, // evvmID
+    "0xStakingAddress" as `0x${string}`,
+    true, // is staking
+    1000000000000000000n, // staking amount
+    1n, // staking nonce
+    1000000000000000000n, // total price
+    50000000000000000n, // priority fee
+    2n, // EVVM nonce
+    true, // priority flag
+  );
 ```
 
 ## Development
