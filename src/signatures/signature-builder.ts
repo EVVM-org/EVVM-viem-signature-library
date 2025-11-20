@@ -1,4 +1,4 @@
-import { WalletClient } from "viem";
+import { Account, WalletClient } from "viem";
 
 /**
  * Signature Builder
@@ -7,7 +7,7 @@ import { WalletClient } from "viem";
 export class SignatureBuilder {
   constructor(
     protected walletClient: WalletClient,
-    protected account: `0x${string}`,
+    protected account: Account,
   ) {}
 
   /**
