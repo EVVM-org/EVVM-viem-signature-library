@@ -42,7 +42,7 @@ function constructMessageForDepositFisher(
   nonce: bigint,
   tokenAddress: string,
   priorityFee: string,
-  ammount: string,
+  ammount: string
 ): string {
   // For ERC20 tokens, include token address in the message
   // For native currency, exclude token address
@@ -77,11 +77,11 @@ function buildMessageSignedForPay(
   priorityFee: bigint,
   nonce: bigint,
   priorityFlag: boolean,
-  executor: `0x${string}`,
+  executor: `0x${string}`
 ): string {
   if (typeof to !== "string" || !to) {
     throw new Error(
-      "Invalid 'to' address passed to buildMessageSignedForPay: value is undefined or not a string",
+      "Invalid 'to' address passed to buildMessageSignedForPay: value is undefined or not a string"
     );
   }
   const inputs: string =
@@ -121,10 +121,10 @@ function buildMessageSignedForDispersePay(
   priorityFee: bigint,
   nonce: bigint,
   priorityFlag: boolean,
-  executor: `0x${string}`,
+  executor: `0x${string}`
 ): string {
   const inputs: string =
-    `${"0x" + hashList.toUpperCase().slice(2)},` +
+    `${hashList.toLowerCase()},` +
     // the token address is always an address so we use toLowerCase() to avoid case sensitivity issues
     `${tokenAddress.toLowerCase()},` +
     // the amount is set all in decimal format
@@ -154,7 +154,7 @@ function buildMessageSignedForPublicStaking(
   evvmID: bigint,
   isStaking: boolean,
   amountOfSMate: bigint,
-  nonce: bigint,
+  nonce: bigint
 ): string {
   const inputs: string =
     `${isStaking ? "true" : "false"},` +
@@ -168,7 +168,7 @@ function buildMessageSignedForPresaleStaking(
   evvmID: bigint,
   isStaking: boolean,
   amountOfSMate: bigint,
-  nonce: bigint,
+  nonce: bigint
 ): string {
   const inputs: string =
     `${isStaking ? "true" : "false"},` +
@@ -183,7 +183,7 @@ function buildMessageSignedForPublicServiceStake(
   serviceAddress: string,
   isStaking: boolean,
   amountOfSMate: bigint,
-  nonce: bigint,
+  nonce: bigint
 ): string {
   const inputs: string =
     `${serviceAddress.toLowerCase()},` +
@@ -205,18 +205,15 @@ function buildMessageSignedForPublicServiceStake(
 function buildMessageSignedForPreRegistrationUsername(
   evvmID: bigint,
   hashUsername: string,
-  nonceNameService: bigint,
+  nonceNameService: bigint
 ): string {
   const inputs: string =
-    `${
-      hashUsername.toLowerCase().slice(0, 2) +
-      hashUsername.toUpperCase().slice(2)
-    },` + `${nonceNameService.toString()}`;
+    `${hashUsername.toLowerCase()},` + `${nonceNameService.toString()}`;
 
   return basicMessageBuilder(
     evvmID.toString(),
     "preRegistrationUsername",
-    inputs,
+    inputs
   );
 }
 
@@ -224,7 +221,7 @@ function buildMessageSignedForRegistrationUsername(
   evvmID: bigint,
   username: string,
   clowNumber: bigint,
-  nonceNameService: bigint,
+  nonceNameService: bigint
 ): string {
   const inputs: string =
     `${username},` +
@@ -239,7 +236,7 @@ function buildMessageSignedForMakeOffer(
   username: string,
   dateExpire: bigint,
   amount: bigint,
-  nonceNameService: bigint,
+  nonceNameService: bigint
 ): string {
   const inputs: string =
     `${username},` +
@@ -254,7 +251,7 @@ function buildMessageSignedForWithdrawOffer(
   evvmID: bigint,
   username: string,
   offerId: bigint,
-  mateNameServiceNonce: bigint,
+  mateNameServiceNonce: bigint
 ): string {
   const inputs: string =
     `${username},` +
@@ -268,7 +265,7 @@ function buildMessageSignedForAcceptOffer(
   evvmID: bigint,
   username: string,
   offerId: bigint,
-  mateNameServiceNonce: bigint,
+  mateNameServiceNonce: bigint
 ): string {
   const inputs: string =
     `${username},` +
@@ -281,7 +278,7 @@ function buildMessageSignedForAcceptOffer(
 function buildMessageSignedForRenewUsername(
   evvmID: bigint,
   username: string,
-  mateNameServiceNonce: bigint,
+  mateNameServiceNonce: bigint
 ): string {
   const inputs: string = `${username},` + `${mateNameServiceNonce.toString()}`;
 
@@ -292,7 +289,7 @@ function buildMessageSignedForAddCustomMetadata(
   evvmID: bigint,
   identity: string,
   value: string,
-  mateNameServiceNonce: bigint,
+  mateNameServiceNonce: bigint
 ): string {
   const inputs: string =
     `${identity},` + `${value},` + `${mateNameServiceNonce.toString()}`;
@@ -304,7 +301,7 @@ function buildMessageSignedForRemoveCustomMetadata(
   evvmID: bigint,
   identity: string,
   key: bigint,
-  nonceNameService: bigint,
+  nonceNameService: bigint
 ): string {
   const inputs: string =
     `${identity},` + `${key.toString()},` + `${nonceNameService.toString()}`;
@@ -315,7 +312,7 @@ function buildMessageSignedForRemoveCustomMetadata(
 function buildMessageSignedForFlushCustomMetadata(
   evvmID: bigint,
   identity: string,
-  nonceNameService: bigint,
+  nonceNameService: bigint
 ): string {
   const inputs: string = `${identity},` + `${nonceNameService.toString()}`;
 
@@ -325,7 +322,7 @@ function buildMessageSignedForFlushCustomMetadata(
 function buildMessageSignedForFlushUsername(
   evvmID: bigint,
   username: string,
-  nonceNameService: bigint,
+  nonceNameService: bigint
 ): string {
   const inputs: string = `${username},` + `${nonceNameService.toString()}`;
 
@@ -346,7 +343,7 @@ function buildMessageSignedForMakeOrder(
   tokenA: string,
   tokenB: string,
   amountA: string,
-  amountB: string,
+  amountB: string
 ): string {
   const inputs: string =
     `${nonce.toString()},` +
@@ -395,7 +392,7 @@ function buildMessageSignedForDispatchOrder(
 function basicMessageBuilder(
   evvmID: string,
   functionName: string,
-  inputs: string,
+  inputs: string
 ): string {
   return evvmID + "," + functionName + "," + inputs;
 }

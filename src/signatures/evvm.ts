@@ -96,7 +96,7 @@ export class EVVMSignatureBuilder {
     const hashedEncodedData = hashDispersePaymentUsersToPay(toData);
     const message = buildMessageSignedForDispersePay(
       evvmID,
-      "0x" + hashedEncodedData.toUpperCase().slice(2),
+      hashedEncodedData,
       tokenAddress,
       amount,
       priorityFee,
