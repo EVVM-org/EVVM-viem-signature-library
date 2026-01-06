@@ -65,7 +65,5 @@
     "tslib": "^2.6.0",
     "typescript": "^5.0.0"
   },
-  "dependencies": {
-    "viem": "^2.0.0"
-  }
+  "dependencies": {}
 }

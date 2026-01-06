@@ -1,38 +1,17 @@
+import {
+  buildMessageSignedForCancelOrder,
+  buildMessageSignedForDispatchOrder,
+  buildMessageSignedForMakeOrder,
+} from "../utils";
+import { SignatureBuilder } from "./signature-builder";
+
 /**
  * P2PSwap Signature Builder
  *
  * Utility class for building and signing P2PSwap order transactions.
  * Provides functions for each P2PSwap action, using viem for EIP-191 signatures.
  */
-
-import type { Account, WalletClient } from "viem";
-import {
-  buildMessageSignedForCancelOrder,
-  buildMessageSignedForDispatchOrder,
-  buildMessageSignedForMakeOrder,
-} from "../utils";
-
-export class P2PSwapSignatureBuilder {
-  private walletClient: WalletClient;
-  private account: Account;
-
-  constructor(walletClient: WalletClient, account: Account) {
-    this.walletClient = walletClient;
-    this.account = account;
-  }
-
-  /**
-   * Signs a generic EIP-191 message.
-   * @param message Message to sign
-   * @returns Promise resolving to signature string
-   */
-  async signERC191Message(message: string): Promise<`0x${string}`> {
-    return await this.walletClient.signMessage({
-      account: this.account,
-      message,
-    });
-  }
-
+export class P2PSwapSignatureBuilder extends SignatureBuilder {
   /**
    * Signs a token swap order creation message
    * @param evvmID EVVM chain ID

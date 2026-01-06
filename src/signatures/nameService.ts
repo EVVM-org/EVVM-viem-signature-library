@@ -1,12 +1,3 @@
-/**
- * NameService Signature Builder
- *
- * Utility class for building and signing NameService messages (offers, registration, metadata, etc).
- * Provides functions for each NameService action, using viem for EIP-191 signatures.
- * Includes dual-signature logic for priority fee payments.
- */
-
-import type { Account, WalletClient } from "viem";
 import {
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
@@ -21,33 +12,21 @@ import {
   buildMessageSignedForFlushUsername,
   hashPreRegisteredUsername,
 } from "../utils";
+import { SignatureBuilder } from "./signature-builder";
 
 export interface DualSignatureResult {
   paySignature?: `0x${string}`;
   actionSignature: `0x${string}`;
 }
 
-export class NameServiceSignatureBuilder {
-  private walletClient: WalletClient;
-  private account: Account;
-
-  constructor(walletClient: WalletClient, account: Account) {
-    this.walletClient = walletClient;
-    this.account = account;
-  }
-
-  /**
-   * Signs a generic EIP-191 message.
-   * @param message Message to sign
-   * @returns Promise resolving to signature string
-   */
-  async signERC191Message(message: string): Promise<`0x${string}`> {
-    return await this.walletClient.signMessage({
-      account: this.account,
-      message,
-    });
-  }
-
+/**
+ * NameService Signature Builder
+ *
+ * Utility class for building and signing NameService messages (offers, registration, metadata, etc).
+ * Provides functions for each NameService action, using viem for EIP-191 signatures.
+ * Includes dual-signature logic for priority fee payments.
+ */
+export class NameServiceSignatureBuilder extends SignatureBuilder {
   /**
    * Signs a NameService username pre-registration message.
    * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
@@ -60,17 +39,17 @@ export class NameServiceSignatureBuilder {
     nonce: bigint,
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<DualSignatureResult> {
     const hashPreReg = hashPreRegisteredUsername(username, clowNumber);
     const preRegistrationMessage = buildMessageSignedForPreRegistrationUsername(
       evvmId,
       hashPreReg,
-      nonce
+      nonce,
     );
 
     const actionSignature = await this.signERC191Message(
-      preRegistrationMessage
+      preRegistrationMessage,
     );
 
     let paySignature: `0x${string}` | undefined;
@@ -83,7 +62,7 @@ export class NameServiceSignatureBuilder {
         priorityFee_EVVM,
         nonce_EVVM,
         priorityFlag_EVVM,
-        addressNameService
+        addressNameService,
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -106,13 +85,13 @@ export class NameServiceSignatureBuilder {
     mateReward: bigint,
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<DualSignatureResult> {
     const registrationMessage = buildMessageSignedForRegistrationUsername(
       evvmId,
       username,
       clowNumber,
-      nonce
+      nonce,
     );
 
     const payMessage = buildMessageSignedForPay(
@@ -123,7 +102,7 @@ export class NameServiceSignatureBuilder {
       priorityFee_EVVM,
       nonce_EVVM,
       priorityFlag_EVVM,
-      addressNameService
+      addressNameService,
     );
 
     const actionSignature = await this.signERC191Message(registrationMessage);
@@ -148,14 +127,14 @@ export class NameServiceSignatureBuilder {
     nonce: bigint,
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<DualSignatureResult> {
     const makeOfferMessage = buildMessageSignedForMakeOffer(
       evvmID,
       username,
       expirationDate,
       amount,
-      nonce
+      nonce,
     );
 
     const payMessage = buildMessageSignedForPay(
@@ -166,7 +145,7 @@ export class NameServiceSignatureBuilder {
       priorityFee_EVVM,
       nonce_EVVM,
       priorityFlag_EVVM,
-      addressNameService
+      addressNameService,
     );
 
     const actionSignature = await this.signERC191Message(makeOfferMessage);
@@ -189,13 +168,13 @@ export class NameServiceSignatureBuilder {
     nonce: bigint,
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<DualSignatureResult> {
     const withdrawOfferMessage = buildMessageSignedForWithdrawOffer(
       evvmID,
       username,
       offerId,
-      nonce
+      nonce,
     );
 
     const actionSignature = await this.signERC191Message(withdrawOfferMessage);
@@ -210,7 +189,7 @@ export class NameServiceSignatureBuilder {
         priorityFee_EVVM,
         nonce_EVVM,
         priorityFlag_EVVM,
-        addressNameService
+        addressNameService,
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -232,13 +211,13 @@ export class NameServiceSignatureBuilder {
     nonce: bigint,
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<DualSignatureResult> {
     const acceptOfferMessage = buildMessageSignedForAcceptOffer(
       evvmID,
       username,
       offerId,
-      nonce
+      nonce,
     );
 
     const actionSignature = await this.signERC191Message(acceptOfferMessage);
@@ -253,7 +232,7 @@ export class NameServiceSignatureBuilder {
         priorityFee_EVVM,
         nonce_EVVM,
         priorityFlag_EVVM,
-        addressNameService
+        addressNameService,
       );
       paySignature = await this.signERC191Message(payMessage);
     }
@@ -275,12 +254,12 @@ export class NameServiceSignatureBuilder {
     amountToRenew: bigint,
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<DualSignatureResult> {
     const renewUsernameMessage = buildMessageSignedForRenewUsername(
       evvmID,
       username,
-      nonce
+      nonce,
     );
     const payMessage = buildMessageSignedForPay(
       evvmID,
@@ -290,7 +269,7 @@ export class NameServiceSignatureBuilder {
       priorityFee_EVVM,
       nonce_EVVM,
       priorityFlag_EVVM,
-      addressNameService
+      addressNameService,
     );
 
     const actionSignature = await this.signERC191Message(renewUsernameMessage);
@@ -314,13 +293,13 @@ export class NameServiceSignatureBuilder {
     amountToAddCustomMetadata: bigint,
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<DualSignatureResult> {
     const addCustomMetadataMessage = buildMessageSignedForAddCustomMetadata(
       evvmID,
       identity,
       value,
-      nonce
+      nonce,
     );
     const payMessage = buildMessageSignedForPay(
       evvmID,
@@ -330,11 +309,11 @@ export class NameServiceSignatureBuilder {
       priorityFee_EVVM,
       nonce_EVVM,
       priorityFlag_EVVM,
-      addressNameService
+      addressNameService,
     );
 
     const actionSignature = await this.signERC191Message(
-      addCustomMetadataMessage
+      addCustomMetadataMessage,
     );
 
     const paySignature = await this.signERC191Message(payMessage);
@@ -357,7 +336,7 @@ export class NameServiceSignatureBuilder {
     amountToRemoveCustomMetadata: bigint,
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<DualSignatureResult> {
     const removeCustomMetadataMessage =
       buildMessageSignedForRemoveCustomMetadata(evvmID, identity, key, nonce);
@@ -370,11 +349,11 @@ export class NameServiceSignatureBuilder {
       priorityFee_EVVM,
       nonce_EVVM,
       priorityFlag_EVVM,
-      addressNameService
+      addressNameService,
     );
 
     const actionSignature = await this.signERC191Message(
-      removeCustomMetadataMessage
+      removeCustomMetadataMessage,
     );
 
     const paySignature = await this.signERC191Message(payMessage);
@@ -396,12 +375,12 @@ export class NameServiceSignatureBuilder {
     priceToFlushCustomMetadata: bigint,
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<DualSignatureResult> {
     const flushCustomMetadataMessage = buildMessageSignedForFlushCustomMetadata(
       evvmID,
       identity,
-      nonce
+      nonce,
     );
 
     const payMessage = buildMessageSignedForPay(
@@ -412,11 +391,11 @@ export class NameServiceSignatureBuilder {
       priorityFee_EVVM,
       nonce_EVVM,
       priorityFlag_EVVM,
-      addressNameService
+      addressNameService,
     );
 
     const actionSignature = await this.signERC191Message(
-      flushCustomMetadataMessage
+      flushCustomMetadataMessage,
     );
 
     const paySignature = await this.signERC191Message(payMessage);
@@ -438,12 +417,12 @@ export class NameServiceSignatureBuilder {
     priceToFlushUsername: bigint,
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean
+    priorityFlag_EVVM: boolean,
   ): Promise<DualSignatureResult> {
     const flushUsernameMessage = buildMessageSignedForFlushUsername(
       evvmID,
       username,
-      nonce
+      nonce,
     );
 
     const payMessage = buildMessageSignedForPay(
@@ -454,7 +433,7 @@ export class NameServiceSignatureBuilder {
       priorityFee_EVVM,
       nonce_EVVM,
       priorityFlag_EVVM,
-      addressNameService
+      addressNameService,
     );
 
     const actionSignature = await this.signERC191Message(flushUsernameMessage);

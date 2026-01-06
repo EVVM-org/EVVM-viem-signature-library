@@ -1,3 +1,11 @@
+import {
+  buildMessageSignedForDispersePay,
+  buildMessageSignedForPay,
+  hashDispersePaymentUsersToPay,
+} from "../utils";
+import { DispersePayMetadata } from "../types";
+import { SignatureBuilder } from "./signature-builder";
+
 /**
  * EVVM Signature Builder
  *
@@ -5,36 +13,7 @@
  * Provides functions for each EVVM action, using viem for EIP-191 signatures.
  * Includes logic for single and multiple recipient payments.
  */
-
-import type { Account, WalletClient } from 'viem';
-import {
-  buildMessageSignedForDispersePay,
-  buildMessageSignedForPay,
-  hashDispersePaymentUsersToPay,
-} from '../utils';
-import { DispersePayMetadata } from '../types';
-
-export class EVVMSignatureBuilder {
-  private walletClient: WalletClient;
-  private account: Account;
-
-  constructor(walletClient: WalletClient, account: Account) {
-    this.walletClient = walletClient;
-    this.account = account;
-  }
-
-  /**
-   * Signs a generic EIP-191 message.
-   * @param message Message to sign
-   * @returns Promise resolving to signature string
-   */
-  async signERC191Message(message: string): Promise<`0x${string}`> {
-    return await this.walletClient.signMessage({
-      account: this.account,
-      message,
-    });
-  }
-
+export class EVVMSignatureBuilder extends SignatureBuilder {
   /**
    * Signs an EVVM payment message.
    * @param evvmID EVVM chain ID
@@ -55,7 +34,7 @@ export class EVVMSignatureBuilder {
     priorityFee: bigint,
     nonce: bigint,
     priorityFlag: boolean,
-    executor: `0x${string}`
+    executor: `0x${string}`,
   ): Promise<`0x${string}`> {
     const message = buildMessageSignedForPay(
       evvmID,
@@ -65,7 +44,7 @@ export class EVVMSignatureBuilder {
       priorityFee,
       nonce,
       priorityFlag,
-      executor
+      executor,
     );
 
     return await this.signERC191Message(message);
@@ -91,7 +70,7 @@ export class EVVMSignatureBuilder {
     priorityFee: bigint,
     nonce: bigint,
     priorityFlag: boolean,
-    executor: `0x${string}`
+    executor: `0x${string}`,
   ): Promise<`0x${string}`> {
     const hashedEncodedData = hashDispersePaymentUsersToPay(toData);
     const message = buildMessageSignedForDispersePay(
@@ -102,7 +81,7 @@ export class EVVMSignatureBuilder {
       priorityFee,
       nonce,
       priorityFlag,
-      executor
+      executor,
     );
 
     return await this.signERC191Message(message);
