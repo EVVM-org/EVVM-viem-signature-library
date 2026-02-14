@@ -1,3 +1,14 @@
+# EVVM Viem Signature Library
+
+## ⚠️ DEPRECATED
+
+This library is **no longer maintained** and has been deprecated in favor of [`@evvm/evvm-js`](https://github.com/EVVM-org/evvm-js).
+
+**Please migrate to the new library:**
+- 📦 NPM: [`@evvm/evvm-js`](https://www.npmjs.com/package/@evvm/evvm-js)
+- 💻 GitHub: [EVVM-org/evvm-js](https://github.com/EVVM-org/evvm-js)
+
+
 # @evvm/viem-signature-library
 
 A TypeScript library for EVVM blockchain interactions, signature building, and transaction execution. Includes payments, staking, NameService, and utilities for EVVM contracts.
